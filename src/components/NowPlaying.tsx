@@ -5,9 +5,10 @@ import './NowPlaying.css'
 interface Props {
   track: Track | null
   isVisible?: boolean
+  onShowDetails?: (track: Track) => void
 }
 
-const NowPlaying: React.FC<Props> = ({ track, isVisible = false }) => {
+const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }) => {
   const [showDetails, setShowDetails] = useState(false)
   const [autoShowTimer, setAutoShowTimer] = useState<NodeJS.Timeout | null>(null)
 
@@ -48,12 +49,18 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false }) => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    })
+    const isUpcoming = date > new Date()
+    return {
+      formatted: date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      isUpcoming
+    }
   }
+
+  const dateInfo = formatDate(track.show.date)
 
   return (
     <div 
@@ -64,7 +71,10 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false }) => {
       {/* Always visible: Now playing indicator */}
       <div className="now-playing-indicator">
         <div className="vinyl-icon">🎵</div>
-        <div className="track-title">{track.title}</div>
+        <div className="track-info">
+          <div className="track-title">{track.title}</div>
+          <div className="artist-name-small">{track.artist}</div>
+        </div>
       </div>
 
       {/* Expandable details */}
@@ -80,16 +90,25 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false }) => {
             ))}
           </div>
 
-          {track.show && (
-            <div className="show-info">
-              <div className="show-date">
-                📅 {formatDate(track.show.date)}
-              </div>
-              <div className="show-venue">
-                📍 {track.show.venue}
-              </div>
+          <div className="show-info">
+            <div className="show-date">
+              📅 {dateInfo.formatted}
             </div>
-          )}
+            <div className="show-venue">
+              📍 {track.show.venue}
+            </div>
+            {dateInfo.isUpcoming && (
+              <div className="upcoming-indicator">🔥 Upcoming Show!</div>
+            )}
+          </div>
+
+          {/* Call to Action */}
+          <button 
+            className="get-tickets-cta"
+            onClick={() => onShowDetails?.(track)}
+          >
+            {dateInfo.isUpcoming ? '🎫 Get Tickets' : '🎵 More Info'}
+          </button>
 
           <div className="vibe-coordinates">
             <div className="coordinate">

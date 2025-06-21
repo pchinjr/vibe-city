@@ -8,7 +8,7 @@
     "texture": 0.8,
     "tags": ["electronic", "energetic", "synthetic"],
     "show": {
-      "date": "2025-07-15",
+      "date": "2025-01-15T21:00:00",
       "venue": "The Signal"
     }
   },
@@ -21,7 +21,7 @@
     "texture": 0.2,
     "tags": ["rock", "punk", "raw"],
     "show": {
-      "date": "2025-07-20",
+      "date": "2025-01-20T20:30:00",
       "venue": "Barking Legs Theater"
     }
   },
@@ -34,7 +34,7 @@
     "texture": 0.8,
     "tags": ["ambient", "dreamy", "synthetic"],
     "show": {
-      "date": "2025-08-05",
+      "date": "2025-02-05T19:00:00",
       "venue": "Songbirds"
     }
   },
@@ -47,8 +47,34 @@
     "texture": 0.2,
     "tags": ["folk", "acoustic", "organic"],
     "show": {
-      "date": "2025-07-28",
+      "date": "2025-01-28T20:00:00",
       "venue": "JJ's Bohemia"
+    }
+  },
+  {
+    "id": "5",
+    "title": "Neon Dreams",
+    "artist": "Synthwave Collective",
+    "audioUrl": "/audio/neon_dreams",
+    "energy": 0.6,
+    "texture": 0.9,
+    "tags": ["synthwave", "retro", "electronic"],
+    "show": {
+      "date": "2025-02-12T21:30:00",
+      "venue": "The Warehouse"
+    }
+  },
+  {
+    "id": "6",
+    "title": "Backyard Blues",
+    "artist": "Delta Revival",
+    "audioUrl": "/audio/backyard_blues",
+    "energy": 0.4,
+    "texture": 0.1,
+    "tags": ["blues", "soulful", "organic"],
+    "show": {
+      "date": "2025-01-25T19:30:00",
+      "venue": "Rhythm & Brews"
     }
   }
 ]

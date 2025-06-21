@@ -33,6 +33,7 @@
 .vinyl-icon {
   font-size: 1.5rem;
   animation: spin 3s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
@@ -40,11 +41,27 @@
   to { transform: rotate(360deg); }
 }
 
+.track-info {
+  flex: 1;
+  min-width: 0; /* Allow text to truncate */
+}
+
 .track-title {
   font-size: 1.1rem;
   font-weight: bold;
   color: #ff6b6b;
-  flex: 1;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist-name-small {
+  font-size: 0.9rem;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .track-details {
@@ -99,6 +116,39 @@
   font-size: 0.9rem;
   margin: 2px 0;
   color: #ccc;
+}
+
+.upcoming-indicator {
+  font-size: 0.8rem;
+  color: #ff6b6b;
+  font-weight: bold;
+  margin-top: 5px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.get-tickets-cta {
+  width: 100%;
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 12px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+}
+
+.get-tickets-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
 }
 
 .vibe-coordinates {
