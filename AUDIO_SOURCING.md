@@ -41,13 +41,13 @@
 cd public/audio
 
 # Option A: Use curl to download from URLs
-curl -o electric_storm.mp3 "YOUR_ELECTRONIC_TRACK_URL"
-curl -o garage_anthem.mp3 "YOUR_ROCK_TRACK_URL"  
-curl -o midnight_drift.mp3 "YOUR_AMBIENT_TRACK_URL"
-curl -o river_folk.mp3 "YOUR_FOLK_TRACK_URL"
+curl -o electric_storm.wav "YOUR_ELECTRONIC_TRACK_URL"
+curl -o garage_anthem.wav "YOUR_ROCK_TRACK_URL"  
+curl -o midnight_drift.wav "YOUR_AMBIENT_TRACK_URL"
+curl -o river_folk.wav "YOUR_FOLK_TRACK_URL"
 
-# Option B: Use ffmpeg to trim longer tracks
-ffmpeg -i long_track.mp3 -ss 00:00:30 -t 00:00:20 -c copy short_clip.mp3
+# Option B: Use ffmpeg to trim longer tracks and convert to WAV
+ffmpeg -i long_track.mp3 -ss 00:00:30 -t 00:00:20 short_clip.wav
 ```
 
 ## 🎨 Audio Characteristics by Quadrant

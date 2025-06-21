@@ -18,10 +18,10 @@ ls -la "$AUDIO_DIR"/*.{mp3,wav,m4a} 2>/dev/null || echo "   No audio files found
 
 echo ""
 echo "🎯 Required files:"
-echo "   - electric_storm.mp3 (🔋 High Energy + Synthetic)"
-echo "   - garage_anthem.mp3 (🎸 High Energy + Organic)"  
-echo "   - midnight_drift.mp3 (🌌 Low Energy + Synthetic)"
-echo "   - river_folk.mp3 (🧃 Low Energy + Organic)"
+echo "   - electric_storm.wav (🔋 High Energy + Synthetic)"
+echo "   - garage_anthem.wav (🎸 High Energy + Organic)"  
+echo "   - midnight_drift.wav (🌌 Low Energy + Synthetic)"
+echo "   - river_folk.wav (🧃 Low Energy + Organic)"
 
 echo ""
 echo "⚡ Quick commands:"
@@ -31,7 +31,7 @@ echo "   open http://localhost:3000  # Open in browser"
 # Check if required files exist
 echo ""
 echo "✅ File status:"
-for file in "electric_storm.mp3" "garage_anthem.mp3" "midnight_drift.mp3" "river_folk.mp3"; do
+for file in "electric_storm.wav" "garage_anthem.wav" "midnight_drift.wav" "river_folk.wav"; do
     if [ -f "$AUDIO_DIR/$file" ]; then
         size=$(ls -lh "$AUDIO_DIR/$file" | awk '{print $5}')
         echo "   ✓ $file ($size)"
