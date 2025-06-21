@@ -12,28 +12,20 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
   const [isAudioReady, setIsAudioReady] = useState(false)
+  const [needsUserInteraction, setNeedsUserInteraction] = useState(true)
   const padRef = useRef<HTMLDivElement>(null)
 
-  // Initialize audio engine and preload tracks
+  // Initialize tracks list (but not audio context)
   useEffect(() => {
-    const initAudio = async () => {
-      try {
-        const tracks = VibeEngine.getAllTracks()
-        await AudioEngine.preloadAllTracks(tracks)
-        setIsAudioReady(true)
-        
-        // Start with initial track
-        const initialTrack = VibeEngine.findNearestTrack(coordinates)
-        if (initialTrack) {
-          setCurrentTrack(initialTrack)
-          onTrackChange?.(initialTrack)
-        }
-      } catch (error) {
-        console.error('Failed to initialize audio:', error)
-      }
+    const tracks = VibeEngine.getAllTracks()
+    AudioEngine.preloadAllTracks(tracks)
+    
+    // Set initial track for display
+    const initialTrack = VibeEngine.findNearestTrack(coordinates)
+    if (initialTrack) {
+      setCurrentTrack(initialTrack)
+      onTrackChange?.(initialTrack)
     }
-
-    initAudio()
   }, [])
 
   // Handle coordinate changes and find nearest track
@@ -64,12 +56,32 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
     setCoordinates({ x, y })
   }, [])
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Initialize audio context on first user interaction
-    if (!isAudioReady) {
-      AudioEngine.initialize()
-    }
+  // Handle first user interaction to initialize audio
+  const handleFirstInteraction = async () => {
+    if (!needsUserInteraction) return
     
+    try {
+      await AudioEngine.initializeAfterUserGesture()
+      const tracks = VibeEngine.getAllTracks()
+      await AudioEngine.loadAllTracksAfterInteraction(tracks)
+      
+      setNeedsUserInteraction(false)
+      setIsAudioReady(true)
+      
+      // Play initial track
+      const initialTrack = VibeEngine.findNearestTrack(coordinates)
+      if (initialTrack) {
+        await AudioEngine.playTrack(initialTrack)
+      }
+      
+      console.log('Audio system ready!')
+    } catch (error) {
+      console.error('Failed to initialize audio after user interaction:', error)
+    }
+  }
+
+  const handleMouseDown = async (e: React.MouseEvent) => {
+    await handleFirstInteraction()
     setIsDragging(true)
     updateCoordinates(e.clientX, e.clientY)
   }
@@ -85,12 +97,8 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
   }
 
   // Touch events for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    // Initialize audio context on first user interaction
-    if (!isAudioReady) {
-      AudioEngine.initialize()
-    }
-    
+  const handleTouchStart = async (e: React.TouchEvent) => {
+    await handleFirstInteraction()
     setIsDragging(true)
     const touch = e.touches[0]
     updateCoordinates(touch.clientX, touch.clientY)
@@ -112,7 +120,7 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
     <div className="vibe-pad-container">
       <div 
         ref={padRef}
-        className={`vibe-pad ${isDragging ? 'dragging' : ''}`}
+        className={`vibe-pad ${isDragging ? 'dragging' : ''} ${needsUserInteraction ? 'needs-interaction' : ''}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -121,6 +129,13 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
+        {/* User interaction prompt */}
+        {needsUserInteraction && (
+          <div className="interaction-prompt">
+            <div className="prompt-text">🎛️ Click or drag to tune in</div>
+          </div>
+        )}
+        
         {/* Crosshair cursor */}
         <div 
           className="vibe-cursor"
@@ -145,15 +160,18 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
       <div className="coordinates-debug">
         <div>Energy: {(1 - coordinates.y).toFixed(2)} (High ↑)</div>
         <div>Texture: {coordinates.x.toFixed(2)} (Synthetic →)</div>
-        {currentTrack && (
+        {needsUserInteraction && (
+          <div className="current-track">🎛️ Click or drag to start audio</div>
+        )}
+        {!needsUserInteraction && currentTrack && (
           <div className="current-track">
             🎵 {currentTrack.artist} - {currentTrack.title}
           </div>
         )}
-        {!currentTrack && isAudioReady && (
+        {!needsUserInteraction && !currentTrack && isAudioReady && (
           <div className="current-track">📻 Static Zone</div>
         )}
-        {!isAudioReady && (
+        {!needsUserInteraction && !isAudioReady && (
           <div className="current-track">⏳ Loading audio...</div>
         )}
       </div>

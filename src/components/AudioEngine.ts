@@ -6,6 +6,7 @@ class AudioEngine {
   private currentGain: GainNode | null = null
   private audioBuffers: Map<string, AudioBuffer> = new Map()
   private isInitialized = false
+  private userHasInteracted = false
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return
@@ -23,6 +24,14 @@ class AudioEngine {
     } catch (error) {
       console.error('Failed to initialize AudioEngine:', error)
     }
+  }
+
+  // Call this on first user interaction
+  async initializeAfterUserGesture(): Promise<void> {
+    if (this.userHasInteracted) return
+    
+    this.userHasInteracted = true
+    await this.initialize()
   }
 
   async loadTrack(track: Track): Promise<void> {
@@ -124,11 +133,11 @@ class AudioEngine {
   }
 
   async playTrack(track: Track): Promise<void> {
+    // Ensure audio context is initialized
     if (!this.audioContext) {
-      await this.initialize()
+      console.warn('AudioContext not initialized - user interaction required')
+      return
     }
-
-    if (!this.audioContext) return
 
     // Stop current track
     this.stopCurrentTrack()
@@ -206,14 +215,23 @@ class AudioEngine {
     }
   }
 
-  // Preload all tracks for smooth experience
+  // Preload all tracks for smooth experience - but don't initialize AudioContext yet
   async preloadAllTracks(tracks: Track[]): Promise<void> {
-    await this.initialize()
+    // Don't initialize AudioContext here - wait for user interaction
+    console.log('Tracks ready for loading after user interaction')
+  }
+
+  // Load tracks after user interaction
+  async loadAllTracksAfterInteraction(tracks: Track[]): Promise<void> {
+    if (!this.audioContext) {
+      console.warn('AudioContext not initialized')
+      return
+    }
     
     const loadPromises = tracks.map(track => this.loadTrack(track))
     await Promise.all(loadPromises)
     
-    console.log('All tracks preloaded')
+    console.log('All tracks loaded')
   }
 }
 

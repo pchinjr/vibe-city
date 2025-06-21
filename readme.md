@@ -3,7 +3,13 @@
 ## 🧭 Project Summary
 
 **VibeCity** is a vibe-first local music discovery app for Chattanooga. Instead of browsing by artist, genre, or calendar, users *tune into vibes* using a 2D sonic map based on **Energy** and **Texture**. Each coordinate in this space represents a song from a local artist. The UI is skeuomorphic, inspired by a vintage radio tuner with “fuzz” in between sonic zones.
+**VibeCity** is a vibe-first local music discovery app for Chattanooga. Instead of browsing by artist, genre, or calendar, users *tune into vibes* using a 2D sonic map based on **Energy** and **Texture**. Each coordinate in this space represents a song from a local artist. The UI is skeuomorphic, inspired by a vintage radio tuner with "fuzz" in between sonic zones.
 
+## ✅ Recent Updates
+
+- **Audio Context Fix**: Resolved browser autoplay policy issues by deferring AudioContext initialization until user interaction
+- **User Experience**: Added visual prompts and animations to guide users to interact with the interface
+- **Error Handling**: Improved audio loading with graceful fallbacks and better error messages
 ---
 
 ## 🎯 Core Concept for Demo
