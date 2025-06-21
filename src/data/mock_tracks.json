@@ -3,7 +3,7 @@
     "id": "1",
     "title": "Electric Storm",
     "artist": "Neon Pulse",
-    "audioUrl": "/audio/electric_storm",
+    "audioUrl": "/audio/electric_storm.wav",
     "energy": 0.8,
     "texture": 0.8,
     "tags": ["electronic", "energetic", "synthetic"],
@@ -16,7 +16,7 @@
     "id": "2",
     "title": "Garage Anthem",
     "artist": "Rust & Thunder",
-    "audioUrl": "/audio/garage_anthem",
+    "audioUrl": "/audio/garage_anthem.wav",
     "energy": 0.8,
     "texture": 0.2,
     "tags": ["rock", "punk", "raw"],
@@ -29,7 +29,7 @@
     "id": "3",
     "title": "Midnight Drift",
     "artist": "Velvet Shadows",
-    "audioUrl": "/audio/midnight_drift",
+    "audioUrl": "/audio/midnight_drift.wav",
     "energy": 0.2,
     "texture": 0.8,
     "tags": ["ambient", "dreamy", "synthetic"],
@@ -42,39 +42,13 @@
     "id": "4",
     "title": "River Folk",
     "artist": "Mountain Hollow",
-    "audioUrl": "/audio/river_folk",
+    "audioUrl": "/audio/river_folk.wav",
     "energy": 0.2,
     "texture": 0.2,
     "tags": ["folk", "acoustic", "organic"],
     "show": {
       "date": "2025-01-28T20:00:00",
       "venue": "JJ's Bohemia"
-    }
-  },
-  {
-    "id": "5",
-    "title": "Neon Dreams",
-    "artist": "Synthwave Collective",
-    "audioUrl": "/audio/neon_dreams",
-    "energy": 0.6,
-    "texture": 0.9,
-    "tags": ["synthwave", "retro", "electronic"],
-    "show": {
-      "date": "2025-02-12T21:30:00",
-      "venue": "The Warehouse"
-    }
-  },
-  {
-    "id": "6",
-    "title": "Backyard Blues",
-    "artist": "Delta Revival",
-    "audioUrl": "/audio/backyard_blues",
-    "energy": 0.4,
-    "texture": 0.1,
-    "tags": ["blues", "soulful", "organic"],
-    "show": {
-      "date": "2025-01-25T19:30:00",
-      "venue": "Rhythm & Brews"
     }
   }
 ]

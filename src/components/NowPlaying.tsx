@@ -74,7 +74,6 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }
         <div className="track-info">
           <div className="track-title">{track.title}</div>
           <div className="artist-name-small">{track.artist}</div>
-          <div className="demo-indicator">🎵 Demo Mode - Test Tones</div>
         </div>
       </div>
 

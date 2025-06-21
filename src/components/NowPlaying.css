@@ -66,13 +66,6 @@
   text-overflow: ellipsis;
 }
 
-.demo-indicator {
-  font-size: 0.7rem;
-  color: #999;
-  font-style: italic;
-  margin-top: 2px;
-}
-
 .track-details {
   border-top: 1px solid #444;
   padding-top: 12px;

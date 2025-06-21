@@ -43,11 +43,18 @@ class AudioEngine {
     try {
       console.log(`Loading track: ${track.title}`)
       
-      // For demo purposes, generate test tones directly
-      // In production, you would try to load actual audio files first
-      const testBuffer = this.generateTestTone(track)
-      this.audioBuffers.set(track.id, testBuffer)
-      console.log(`Generated test tone for: ${track.title}`)
+      // Try to load actual audio file - attempt multiple formats
+      const audioBuffer = await this.tryLoadAudioFile(track)
+      if (audioBuffer) {
+        this.audioBuffers.set(track.id, audioBuffer)
+        console.log(`Loaded: ${track.title}`)
+        return
+      }
+      
+      // If no audio file found, create a simple placeholder tone
+      console.log(`No audio file found for ${track.title}, creating placeholder`)
+      const placeholderBuffer = this.createPlaceholderTone(track)
+      this.audioBuffers.set(track.id, placeholderBuffer)
       
     } catch (error) {
       console.error(`Failed to load track ${track.title}:`, error)
@@ -89,54 +96,34 @@ class AudioEngine {
     return null
   }
 
-  // Generate a test tone based on track characteristics
-  private generateTestTone(track: Track): AudioBuffer {
+  // Create a simple placeholder tone (much simpler than before)
+  private createPlaceholderTone(track: Track): AudioBuffer {
     if (!this.audioContext) throw new Error('AudioContext not initialized')
     
-    const duration = 8 // 8 seconds
+    const duration = 3 // 3 seconds
     const sampleRate = this.audioContext.sampleRate
     const numSamples = sampleRate * duration
     
     const buffer = this.audioContext.createBuffer(1, numSamples, sampleRate)
     const data = buffer.getChannelData(0)
     
-    // Map track characteristics to frequency and timbre
-    const baseFreq = 220 + (track.energy * 440) // 220-660 Hz based on energy
-    const harmonicRatio = track.texture // More harmonics for synthetic sounds
+    // Simple sine wave based on track energy
+    const frequency = 200 + (track.energy * 200) // 200-400 Hz
     
     for (let i = 0; i < numSamples; i++) {
       const t = i / sampleRate
       
-      // Envelope (fade in/out to prevent clicks)
-      const fadeTime = 0.1 // 100ms fade
+      // Simple envelope
       let envelope = 1
+      const fadeTime = 0.1
       if (t < fadeTime) {
         envelope = t / fadeTime
       } else if (t > duration - fadeTime) {
         envelope = (duration - t) / fadeTime
       }
-      envelope *= 0.3 // Overall volume
       
-      // Fundamental frequency
-      let sample = Math.sin(2 * Math.PI * baseFreq * t)
-      
-      // Add harmonics based on texture (synthetic = more harmonics)
-      if (harmonicRatio > 0.3) {
-        sample += Math.sin(2 * Math.PI * baseFreq * 2 * t) * harmonicRatio * 0.3
-        sample += Math.sin(2 * Math.PI * baseFreq * 3 * t) * harmonicRatio * 0.2
-      }
-      
-      // Add sub-harmonics for organic sounds
-      if (harmonicRatio < 0.7) {
-        sample += Math.sin(2 * Math.PI * baseFreq * 0.5 * t) * (1 - harmonicRatio) * 0.2
-      }
-      
-      // Add some variation to make it more interesting
-      const variation = Math.sin(2 * Math.PI * t * 0.5) * 0.1 // Slow modulation
-      sample *= (1 + variation)
-      
-      // Apply envelope and normalize
-      data[i] = sample * envelope
+      // Simple sine wave
+      data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope * 0.1
     }
     
     return buffer
