@@ -1,0 +1,132 @@
+.now-playing {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #ff6b6b;
+  border-radius: 15px;
+  padding: 15px;
+  min-width: 250px;
+  max-width: 350px;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 107, 107, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.now-playing.expanded {
+  transform: scale(1.05);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(255, 107, 107, 0.4);
+}
+
+.now-playing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.vinyl-icon {
+  font-size: 1.5rem;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.track-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ff6b6b;
+  flex: 1;
+}
+
+.track-details {
+  border-top: 1px solid #444;
+  padding-top: 10px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.artist-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.vibe-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.vibe-tag {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.show-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 3px solid #ff6b6b;
+}
+
+.show-date, .show-venue {
+  font-size: 0.9rem;
+  margin: 2px 0;
+  color: #ccc;
+}
+
+.vibe-coordinates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #999;
+  font-family: 'Courier New', monospace;
+}
+
+.coordinate {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .now-playing {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .vibe-coordinates {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

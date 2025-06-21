@@ -4,9 +4,12 @@ class AudioEngine {
   private audioContext: AudioContext | null = null
   private currentSource: AudioBufferSourceNode | null = null
   private currentGain: GainNode | null = null
+  private nextSource: AudioBufferSourceNode | null = null
+  private nextGain: GainNode | null = null
   private audioBuffers: Map<string, AudioBuffer> = new Map()
   private isInitialized = false
   private userHasInteracted = false
+  private currentTrackId: string | null = null
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return
@@ -139,8 +142,10 @@ class AudioEngine {
       return
     }
 
-    // Stop current track
-    this.stopCurrentTrack()
+    // Don't restart the same track
+    if (this.currentTrackId === track.id) {
+      return
+    }
 
     // Load track if not already loaded
     if (!this.audioBuffers.has(track.id)) {
@@ -150,21 +155,57 @@ class AudioEngine {
     const audioBuffer = this.audioBuffers.get(track.id)
     if (!audioBuffer) return
 
-    // Create new source and gain nodes
-    this.currentSource = this.audioContext.createBufferSource()
-    this.currentGain = this.audioContext.createGain()
-
-    // Connect: source -> gain -> destination
-    this.currentSource.buffer = audioBuffer
-    this.currentSource.connect(this.currentGain)
-    this.currentGain.connect(this.audioContext.destination)
-
-    // Set initial volume and start playing
-    this.currentGain.gain.setValueAtTime(0.7, this.audioContext.currentTime)
-    this.currentSource.loop = true
-    this.currentSource.start()
+    // Crossfade to new track
+    await this.crossfadeToTrack(audioBuffer, track.id)
 
     console.log(`Playing: ${track.title}`)
+  }
+
+  private async crossfadeToTrack(audioBuffer: AudioBuffer, trackId: string): Promise<void> {
+    if (!this.audioContext) return
+
+    const crossfadeDuration = 0.5 // 500ms crossfade
+    const currentTime = this.audioContext.currentTime
+
+    // Create new source and gain for the incoming track
+    this.nextSource = this.audioContext.createBufferSource()
+    this.nextGain = this.audioContext.createGain()
+
+    // Connect: source -> gain -> destination
+    this.nextSource.buffer = audioBuffer
+    this.nextSource.connect(this.nextGain)
+    this.nextGain.connect(this.audioContext.destination)
+
+    // Start new track at 0 volume
+    this.nextGain.gain.setValueAtTime(0, currentTime)
+    this.nextSource.loop = true
+    this.nextSource.start()
+
+    // Fade in new track
+    this.nextGain.gain.linearRampToValueAtTime(0.7, currentTime + crossfadeDuration)
+
+    // Fade out current track if it exists
+    if (this.currentGain && this.currentSource) {
+      this.currentGain.gain.linearRampToValueAtTime(0, currentTime + crossfadeDuration)
+      
+      // Stop old track after fade out
+      setTimeout(() => {
+        if (this.currentSource) {
+          try {
+            this.currentSource.stop()
+          } catch (error) {
+            // Source might already be stopped
+          }
+        }
+      }, crossfadeDuration * 1000 + 100) // Add small buffer
+    }
+
+    // Swap references
+    this.currentSource = this.nextSource
+    this.currentGain = this.nextGain
+    this.currentTrackId = trackId
+    this.nextSource = null
+    this.nextGain = null
   }
 
   stopCurrentTrack(): void {
@@ -176,12 +217,25 @@ class AudioEngine {
       }
       this.currentSource = null
     }
+    if (this.nextSource) {
+      try {
+        this.nextSource.stop()
+      } catch (error) {
+        // Source might already be stopped
+      }
+      this.nextSource = null
+    }
     this.currentGain = null
+    this.nextGain = null
+    this.currentTrackId = null
   }
 
   // Play static/fuzz when in dead zones
   playStatic(): void {
     if (!this.audioContext) return
+
+    // Don't restart static if already playing
+    if (this.currentTrackId === 'static') return
 
     this.stopCurrentTrack()
 
@@ -205,6 +259,7 @@ class AudioEngine {
     this.currentGain.gain.setValueAtTime(0.3, this.audioContext.currentTime)
     this.currentSource.loop = true
     this.currentSource.start()
+    this.currentTrackId = 'static'
 
     console.log('Playing static')
   }

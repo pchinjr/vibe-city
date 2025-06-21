@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import VibeEngine, { Track, VibeCoordinates } from './VibeEngine'
 import AudioEngine from './AudioEngine'
+import EmojiHints from './EmojiHints'
 import './VibePad.css'
 
 interface Props {
@@ -154,6 +155,9 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
             <div key={`v-${i}`} className="grid-line vertical" style={{ left: `${i * 25}%` }} />
           ))}
         </div>
+        
+        {/* Emoji hints overlay */}
+        <EmojiHints />
       </div>
       
       {/* Debug coordinates */}
