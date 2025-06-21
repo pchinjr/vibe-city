@@ -1,0 +1,109 @@
+.vibe-pad-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.vibe-pad {
+  width: 400px;
+  height: 400px;
+  background: 
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
+    linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+    linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+    linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+  background-size: 40px 40px, 20px 20px, 20px 20px, 20px 20px, 20px 20px;
+  background-position: 0 0, 0 0, 10px 0, 10px -10px, 0px 10px;
+  border: 3px solid #666;
+  border-radius: 15px;
+  position: relative;
+  cursor: crosshair;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.vibe-pad:hover {
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 255, 255, 0.2);
+}
+
+.vibe-pad.dragging {
+  box-shadow: 
+    inset 0 0 30px rgba(0, 0, 0, 0.7),
+    0 0 50px rgba(255, 255, 255, 0.3);
+}
+
+.vibe-cursor {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #ff6b6b, #ff4757);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 
+    0 0 15px rgba(255, 107, 107, 0.8),
+    inset 0 0 5px rgba(255, 255, 255, 0.3);
+  transition: all 0.1s ease;
+  z-index: 10;
+}
+
+.vibe-pad.dragging .vibe-cursor {
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 
+    0 0 25px rgba(255, 107, 107, 1),
+    inset 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.grid-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.grid-line.horizontal {
+  width: 100%;
+  height: 1px;
+}
+
+.grid-line.vertical {
+  height: 100%;
+  width: 1px;
+}
+
+.coordinates-debug {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  border: 1px solid #444;
+  text-align: center;
+  min-width: 250px;
+}
+
+.coordinates-debug div {
+  margin: 2px 0;
+  opacity: 0.9;
+}
+
+.current-track {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #555;
+  color: #ff6b6b !important;
+  font-weight: bold;
+}

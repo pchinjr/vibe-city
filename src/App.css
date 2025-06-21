@@ -1,0 +1,49 @@
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #2c1810, #1a1a1a);
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+
+.app-header {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #444;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.app-header p {
+  margin: 5px 0 0 0;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.vibe-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.now-playing {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 2px solid #444;
+  font-size: 0.9rem;
+}
+
+.now-playing span {
+  opacity: 0.9;
+}
