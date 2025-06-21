@@ -29,6 +29,14 @@
   font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
+.demo-notice {
+  margin-top: 8px;
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+  color: #ff6b6b;
+  opacity: 0.8;
+  font-style: italic;
+}
+
 .vibe-container {
   flex: 1;
   position: relative;

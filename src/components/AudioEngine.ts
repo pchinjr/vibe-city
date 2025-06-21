@@ -43,21 +43,17 @@ class AudioEngine {
     try {
       console.log(`Loading track: ${track.title}`)
       
-      // Try to load actual audio file - attempt multiple formats
-      const audioBuffer = await this.tryLoadAudioFile(track)
-      if (audioBuffer) {
-        this.audioBuffers.set(track.id, audioBuffer)
-        console.log(`Loaded: ${track.title}`)
-        return
-      }
-      
-      // Generate test tone if no audio file found
+      // For demo purposes, generate test tones directly
+      // In production, you would try to load actual audio files first
       const testBuffer = this.generateTestTone(track)
       this.audioBuffers.set(track.id, testBuffer)
       console.log(`Generated test tone for: ${track.title}`)
       
     } catch (error) {
       console.error(`Failed to load track ${track.title}:`, error)
+      // Create a silent buffer as fallback
+      const silentBuffer = this.generateSilentBuffer()
+      this.audioBuffers.set(track.id, silentBuffer)
     }
   }
 
@@ -111,8 +107,15 @@ class AudioEngine {
     for (let i = 0; i < numSamples; i++) {
       const t = i / sampleRate
       
-      // Envelope (fade in/out)
-      const envelope = Math.sin(t * Math.PI / duration) * 0.4
+      // Envelope (fade in/out to prevent clicks)
+      const fadeTime = 0.1 // 100ms fade
+      let envelope = 1
+      if (t < fadeTime) {
+        envelope = t / fadeTime
+      } else if (t > duration - fadeTime) {
+        envelope = (duration - t) / fadeTime
+      }
+      envelope *= 0.3 // Overall volume
       
       // Fundamental frequency
       let sample = Math.sin(2 * Math.PI * baseFreq * t)
@@ -128,9 +131,27 @@ class AudioEngine {
         sample += Math.sin(2 * Math.PI * baseFreq * 0.5 * t) * (1 - harmonicRatio) * 0.2
       }
       
+      // Add some variation to make it more interesting
+      const variation = Math.sin(2 * Math.PI * t * 0.5) * 0.1 // Slow modulation
+      sample *= (1 + variation)
+      
       // Apply envelope and normalize
-      data[i] = sample * envelope * 0.3
+      data[i] = sample * envelope
     }
+    
+    return buffer
+  }
+
+  // Generate a silent buffer as ultimate fallback
+  private generateSilentBuffer(): AudioBuffer {
+    if (!this.audioContext) throw new Error('AudioContext not initialized')
+    
+    const duration = 1 // 1 second of silence
+    const sampleRate = this.audioContext.sampleRate
+    const numSamples = sampleRate * duration
+    
+    const buffer = this.audioContext.createBuffer(1, numSamples, sampleRate)
+    // Buffer is already filled with zeros (silence)
     
     return buffer
   }
@@ -239,14 +260,28 @@ class AudioEngine {
 
     this.stopCurrentTrack()
 
-    // Create white noise
-    const bufferSize = this.audioContext.sampleRate * 0.5 // 0.5 seconds
+    // Create filtered white noise (more pleasant than pure white noise)
+    const bufferSize = this.audioContext.sampleRate * 1 // 1 second
     const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate)
     const data = buffer.getChannelData(0)
 
-    // Generate white noise
+    // Generate filtered white noise
     for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.1 // Low volume static
+      const t = i / this.audioContext.sampleRate
+      
+      // Create filtered noise (less harsh than pure white noise)
+      let noise = (Math.random() * 2 - 1) * 0.08 // Lower volume
+      
+      // Apply simple low-pass filtering by averaging with previous samples
+      if (i > 0) {
+        noise = (noise + data[i - 1] * 0.3) / 1.3
+      }
+      
+      // Add some subtle modulation to make it more radio-like
+      const modulation = Math.sin(2 * Math.PI * t * 2) * 0.02
+      noise *= (1 + modulation)
+      
+      data[i] = noise
     }
 
     this.currentSource = this.audioContext.createBufferSource()
@@ -256,7 +291,7 @@ class AudioEngine {
     this.currentSource.connect(this.currentGain)
     this.currentGain.connect(this.audioContext.destination)
 
-    this.currentGain.gain.setValueAtTime(0.3, this.audioContext.currentTime)
+    this.currentGain.gain.setValueAtTime(0.2, this.audioContext.currentTime) // Even lower volume
     this.currentSource.loop = true
     this.currentSource.start()
     this.currentTrackId = 'static'
