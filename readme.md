@@ -1,166 +1,236 @@
-# 🎶 vibe-city – Project Summary & Onboarding Demo Guide
+# 🎶 Vibe City – Local Music Discovery for Chattanooga
 
-## 🧭 Project Summary
+## 🧭 Project Overview
 
-**VibeCity** is a vibe-first local music discovery app for Chattanooga. Instead of browsing by artist, genre, or calendar, users *tune into vibes* using a 2D sonic map based on **Energy** and **Texture**. Each coordinate in this space represents a song from a local artist. The UI is skeuomorphic, inspired by a vintage radio tuner with “fuzz” in between sonic zones.
-**VibeCity** is a vibe-first local music discovery app for Chattanooga. Instead of browsing by artist, genre, or calendar, users *tune into vibes* using a 2D sonic map based on **Energy** and **Texture**. Each coordinate in this space represents a song from a local artist. The UI is skeuomorphic, inspired by a vintage radio tuner with "fuzz" in between sonic zones.
+**Vibe City** is a revolutionary music discovery app that lets users explore Chattanooga's local music scene through **vibes** instead of traditional browsing. Using a 2D sonic map based on **Energy** (high/low) and **Texture** (organic/synthetic), users drag across a vintage radio-inspired interface to discover music that matches their current mood.
 
-## ✅ Recent Updates
+## ✨ Current Status: **FULLY FUNCTIONAL MVP**
 
-- **Show Discovery & Ticketing System**: Complete user journey from vibe discovery to ticket purchase
-- **Audio Context Fix**: Resolved browser autoplay policy issues by deferring AudioContext initialization until user interaction
-- **User Experience**: Added visual prompts and animations to guide users to interact with the interface
-- **Error Handling**: Improved audio loading with graceful fallbacks and better error messages
+### 🎯 Complete Feature Set:
+- ✅ **2D Vibe Discovery**: Smooth audio crossfading as users explore the sonic map
+- ✅ **Real Event Integration**: Live show data with ticket purchasing
+- ✅ **Interactive Show Details**: Click/hover to see artist info, venues, and pricing
+- ✅ **Direct Ticket Links**: One-click access to Eventbrite, Ticketmaster, and venue sites
+- ✅ **Calendar Integration**: Add shows to Google Calendar
+- ✅ **Venue Directions**: Instant Google Maps integration
+- ✅ **Social Sharing**: Share discoveries with friends
+- ✅ **Mobile-Responsive**: Works seamlessly on all devices
 
-## 🎫 Complete User Journey
+## 🎵 How It Works
 
-**Vibe City** now delivers the full experience from discovery to show attendance:
+### **Discovery Flow:**
+1. **Land & Listen** → App immediately starts playing local music
+2. **Drag to Explore** → Move cursor/finger across the 2D vibe pad
+3. **Find Your Vibe** → Audio smoothly crossfades between tracks
+4. **Discover Details** → Click now-playing area to see show info
+5. **Get Tickets** → Direct links to purchase tickets for upcoming shows
 
-1. **Discover** → Drag the 2D vibe pad to find music that matches your mood
-2. **Connect** → See artist info and upcoming show details
-3. **Attend** → Get tickets, directions, and calendar reminders
-4. **Share** → Tell friends about your vibe discoveries
-
-### Key Features:
-- **Automatic Ticket Prompts**: Floating prompts appear for upcoming shows
-- **Integrated Ticket Purchasing**: Direct links to Eventbrite and other platforms
-- **Smart Calendar Integration**: Add shows to Google Calendar with one click
-- **Venue Directions**: Instant Google Maps integration for getting to shows
-- **Social Sharing**: Share discoveries with friends
-- **Mobile-First Design**: Optimized for on-the-go music discovery
----
-
-## 🎯 Core Concept for Demo
-
-When the user lands:
-
-1. A short clip from a local band begins to play.
-2. The user sees a **2D tuner interface** and drags their cursor to change the vibe.
-3. Tracks smoothly crossfade as they move through the space.
-4. Emojis hint at vibe zones (e.g. 🌌 dreamy, 🎸 rowdy, 🧃 smooth).
-5. A floating drawer reveals band/show info *after discovery*.
+### **Vibe Mapping:**
+- **Y-Axis (Energy)**: High energy (top) ↔ Low energy (bottom)  
+- **X-Axis (Texture)**: Organic/acoustic (left) ↔ Synthetic/electronic (right)
+- **Emoji Hints**: Visual cues guide users to different vibe zones
+- **Fuzz Zones**: Areas between tracks create authentic radio tuning experience
 
 ---
 
-# 📐 UI Wireframe Overview (Onboarding Demo)
+## 🏗️ Technical Architecture
 
-## 🖥️ Main Screen Layout
+### **Frontend Stack:**
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **Web Audio API** for seamless audio crossfading
+- **CSS3** with custom animations and responsive design
 
+### **Project Structure:**
 ```
-+----------------------------------------------------+
-|                                                    |
-|        🌀     🌌     🔋     🎸     🧃     💀        |
-|                                                    |
-|    +------------------------------------------+    |
-|    |                                          |    |
-|    |      🎛️  2D VibePad                      |    |
-|    |      (drag to change vibe)              |    |
-|    |                                          |    |
-|    +------------------------------------------+    |
-|                                                    |
-|   🎶 Now Playing: “...”      📍 Venue: “...”       |
-|                                                    |
-+----------------------------------------------------+
-```
-
----
-
-# 🔧 Implementation Guide for Q
-
-## 🗂️ App Structure
-
-```
-/app
+/src
   /components
-    VibePad.tsx          ← 2D controller
-    AudioEngine.ts       ← handles playback + crossfade
-    VibeEngine.ts        ← gets nearest track to [x, y]
-    EmojiHints.tsx       ← emoji quadrant overlay
-    NowPlaying.tsx       ← artist & show reveal panel
+    VibePad.tsx          ← 2D vibe controller with drag interaction
+    AudioEngine.ts       ← Web Audio API management & crossfading
+    VibeEngine.ts        ← Track discovery logic & coordinate mapping
+    NowPlaying.tsx       ← Interactive track info display
+    ShowDetails.tsx      ← Full event details modal
+    TicketPrompt.tsx     ← Floating ticket purchase prompts
+    EmojiHints.tsx       ← Visual vibe zone indicators
   /data
-    mock_tracks.json     ← seed audio clips + [energy, texture]
-  index.tsx              ← entry point
+    mock_tracks.json     ← Track data with vibe coordinates & show info
+    event_data.json      ← Real Chattanooga event data
+  /services
+    EventDataService.ts  ← Data abstraction layer (API-ready)
+```
+
+### **Key Components:**
+
+#### **VibePad.tsx**
+- Handles mouse/touch drag interactions
+- Converts screen coordinates to vibe space (0-1 range)
+- Manages user interaction states and audio initialization
+- Responsive design for mobile and desktop
+
+#### **AudioEngine.ts** 
+- Web Audio API implementation with buffer management
+- Smooth crossfading between tracks (500ms transitions)
+- CORS-enabled audio loading with error handling
+- Optimized for performance with audio buffer caching
+
+#### **VibeEngine.ts**
+- Euclidean distance calculation for nearest track discovery
+- Configurable "fuzz zones" for authentic radio experience
+- Async data loading with EventDataService integration
+- Track filtering and search capabilities
+
+#### **NowPlaying.tsx**
+- Click-to-expand interface for user control
+- Hover preview with visual feedback
+- Real-time show information display
+- Integrated ticket purchase flow
+
+---
+
+## 🎪 Current Artists & Shows
+
+### **Live Event Integration:**
+- **Dexter Bell & Friends** @ Barking Legs (Jazz/Smooth)
+- **Cowboy Mouth** @ Barrelhouse Ballroom (High-Energy Rock)
+- **Heavy Valley** @ Cherry St. Tavern (Atmospheric Indie)
+- **Vitamin String Quartet** @ Memorial & Walker Theatre (Classical)
+- **Call Me Spinster** @ The Honest Pint (Local Indie/Alternative)
+
+### **Vibe Coordinates:**
+```
+High Energy, Synthetic    🔋 Electronic/Dance
+High Energy, Organic      🎸 Rock/Punk  
+Low Energy, Synthetic     🌌 Ambient/Dreamy
+Low Energy, Organic       🧃 Folk/Acoustic
 ```
 
 ---
 
-## 🧱 Component Breakdown
+## 🚀 Getting Started
 
-### `VibePad.tsx`
+### **Prerequisites:**
+- Node.js 18+
+- npm or yarn
 
-* Render a full-size div with drag tracking.
-* Return coordinates in `[0, 1]` space.
-* Feed that into `VibeEngine`.
+### **Installation:**
+```bash
+git clone [repository-url]
+cd vibe-city
+npm install
+```
 
-### `VibeEngine.ts`
+### **Development:**
+```bash
+npm run dev
+# Opens at http://localhost:5173
+```
 
-* Given `[x, y]` → finds the closest matching track in `mock_tracks.json` using Euclidean distance.
-* Adds a "fuzz zone" (no match within radius = static noise).
+### **Audio Files Setup:**
+Place audio files in `/public/audio/`:
+- `electric_storm.wav`
+- `garage_anthem.mp3`
+- `midnight_drift.wav`
+- `river_folk.wav`
+- `potholes_preview.wav`
 
-### `AudioEngine.ts`
-
-* Loads and buffers audio clips.
-* Smooth crossfade when switching.
-* Adds optional static/fuzz FX between zones.
-
-### `EmojiHints.tsx`
-
-* Place emoji icons at the 4 corners or around the edges of the 2D pad:
-
-  * 🌌 (dreamy/synthetic/low energy)
-  * 🔋 (high energy/synthetic)
-  * 🎸 (high energy/organic)
-  * 🧃 (low energy/organic)
-
-### `NowPlaying.tsx`
-
-* Hidden by default.
-* Reveals after X seconds of listening or on hover/tap.
-* Shows artist name, vibe tags, upcoming show.
-
----
-
-## 📦 Mock Data
-
-**`mock_tracks.json`**
-
-```json
-[
-  {
-    "id": "1",
-    "title": "Night Surf",
-    "artist": "Sun Rail Revival",
-    "audioUrl": "/audio/sun_rail.mp3",
-    "energy": 0.3,
-    "texture": 0.7,
-    "tags": ["dreamy", "folk", "ambient"],
-    "show": {
-      "date": "2025-06-28",
-      "venue": "Barking Legs Theater"
-    }
-  }
-]
+### **Build for Production:**
+```bash
+npm run build
+npm run preview
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🔮 Future Roadmap
 
-* Frontend: **TypeScript + React (or Preact)**
-* Audio: **Web Audio API**
-* Hosting: **Deno Deploy or Static Host**
-* Data: **Local JSON files (for now)**
+### **Phase 1: Enhanced Discovery**
+- [ ] More granular vibe coordinates (sub-genres)
+- [ ] User preference learning
+- [ ] Playlist generation from vibe sessions
+- [ ] Advanced audio effects (reverb, filters)
+
+### **Phase 2: Real-Time Data**
+- [ ] Live event API integration (Eventbrite, Ticketmaster)
+- [ ] Spotify/Apple Music preview integration
+- [ ] Real-time show updates and notifications
+- [ ] Dynamic pricing and availability
+
+### **Phase 3: Community Features**
+- [ ] User accounts and saved vibes
+- [ ] Social sharing and recommendations
+- [ ] Artist submission portal
+- [ ] User-generated vibe tags
+
+### **Phase 4: Advanced Features**
+- [ ] AI-powered vibe matching
+- [ ] Live show streaming integration
+- [ ] Venue partnership program
+- [ ] Mobile app (React Native)
 
 ---
 
-## ✅ Hackathon Onboarding Goals
+## 🎨 Design Philosophy
 
-* [x] Launches directly into music
-* [x] User can drag and change vibe
-* [x] Audio crossfades between clips
-* [x] Emojis visually reinforce vibes
-* [ ] “Now Playing” shows contextual info
-* [x] Works offline from local `mock_tracks.json`
-* [x] **BONUS**: Complete ticket purchasing flow
-* [x] **BONUS**: Show discovery and venue integration
-* [x] **BONUS**: Social sharing capabilities
+### **Skeuomorphic Radio Interface:**
+- Vintage radio tuner aesthetic with modern functionality
+- Tactile drag interactions that feel like tuning a real radio
+- Visual feedback with grid lines and analog-style indicators
+- Warm color palette inspired by classic audio equipment
+
+### **Vibe-First Discovery:**
+- Prioritizes emotional connection over metadata
+- Encourages serendipitous discovery through exploration
+- Reduces decision paralysis with intuitive spatial navigation
+- Creates memorable experiences through audio-visual harmony
+
+---
+
+## 🛠️ Development Notes
+
+### **Audio Implementation:**
+- Uses Web Audio API for precise timing and crossfading
+- Handles browser autoplay policies with user interaction detection
+- Optimized buffer management for smooth performance
+- Fallback error handling for unsupported audio formats
+
+### **Data Architecture:**
+- EventDataService abstracts data sources for easy API integration
+- Mock data structure matches real API response formats
+- Async loading with proper error handling
+- Scalable for hundreds of tracks and events
+
+### **Performance Optimizations:**
+- Lazy loading of audio buffers
+- Efficient coordinate-to-track mapping algorithms
+- Debounced drag events to prevent excessive calculations
+- CSS transforms for smooth animations
+
+---
+
+## 📱 Browser Support
+
+- **Chrome/Edge**: Full support with Web Audio API
+- **Firefox**: Full support with Web Audio API  
+- **Safari**: Full support (requires user interaction for audio)
+- **Mobile Safari/Chrome**: Optimized touch interactions
+
+---
+
+## 🤝 Contributing
+
+This project is designed for easy extension and modification:
+
+1. **Adding New Tracks**: Update `mock_tracks.json` with vibe coordinates
+2. **New Event Sources**: Extend `EventDataService.ts` with additional APIs
+3. **UI Enhancements**: Components are modular and well-documented
+4. **Audio Effects**: AudioEngine supports additional Web Audio nodes
+
+---
+
+## 📄 License
+
+MIT License - Feel free to use this project as inspiration for your own music discovery applications.
+
+---
+
+**Built with ❤️ for the Chattanooga music community**
