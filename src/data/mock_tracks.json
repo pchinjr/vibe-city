@@ -16,7 +16,7 @@
     "id": "2",
     "title": "Garage Anthem",
     "artist": "Rust & Thunder",
-    "audioUrl": "/audio/garage_anthem.wav",
+    "audioUrl": "/audio/garage_anthem.mp3",
     "energy": 0.8,
     "texture": 0.2,
     "tags": ["rock", "punk", "raw"],

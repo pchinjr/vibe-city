@@ -36,14 +36,18 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
 
     const nearestTrack = VibeEngine.findNearestTrack(coordinates)
     
-    if (nearestTrack !== currentTrack) {
+    // Only change if we actually have a different track
+    if (nearestTrack?.id !== currentTrack?.id) {
+      console.log(`🎯 Track change: ${currentTrack?.title || 'none'} → ${nearestTrack?.title || 'none'}`)
+      
       setCurrentTrack(nearestTrack)
       onTrackChange?.(nearestTrack)
       
       if (nearestTrack) {
         AudioEngine.playTrack(nearestTrack)
       } else {
-        AudioEngine.playStatic()
+        // In fuzz zone - could add static here later
+        console.log('📻 Entered fuzz zone')
       }
     }
   }, [coordinates, isAudioReady, currentTrack, onTrackChange])

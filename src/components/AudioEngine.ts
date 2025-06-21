@@ -43,104 +43,20 @@ class AudioEngine {
     try {
       console.log(`Loading track: ${track.title}`)
       
-      // Try to load actual audio file - attempt multiple formats
-      const audioBuffer = await this.tryLoadAudioFile(track)
-      if (audioBuffer) {
-        this.audioBuffers.set(track.id, audioBuffer)
-        console.log(`Loaded: ${track.title}`)
-        return
+      const response = await fetch(track.audioUrl)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audio: ${response.status}`)
       }
       
-      // If no audio file found, create a simple placeholder tone
-      console.log(`No audio file found for ${track.title}, creating placeholder`)
-      const placeholderBuffer = this.createPlaceholderTone(track)
-      this.audioBuffers.set(track.id, placeholderBuffer)
+      const arrayBuffer = await response.arrayBuffer()
+      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
+      
+      this.audioBuffers.set(track.id, audioBuffer)
+      console.log(`✅ Loaded: ${track.title}`)
       
     } catch (error) {
       console.error(`Failed to load track ${track.title}:`, error)
-      // Create a silent buffer as fallback
-      const silentBuffer = this.generateSilentBuffer()
-      this.audioBuffers.set(track.id, silentBuffer)
     }
-  }
-
-  // Try to load audio file in multiple formats
-  private async tryLoadAudioFile(track: Track): Promise<AudioBuffer | null> {
-    if (!this.audioContext) return null
-
-    // Extract base filename without extension
-    const basePath = track.audioUrl.replace(/\.[^/.]+$/, "")
-    
-    // Try common audio formats in order of preference
-    const formats = ['wav', 'mp3', 'm4a', 'ogg', 'flac']
-    
-    for (const format of formats) {
-      try {
-        const url = `${basePath}.${format}`
-        console.log(`Trying: ${url}`)
-        
-        const response = await fetch(url)
-        if (response.ok && response.status === 200) {
-          const arrayBuffer = await response.arrayBuffer()
-          const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
-          console.log(`✅ Found and loaded: ${url}`)
-          return audioBuffer
-        }
-      } catch (error) {
-        // Continue to next format
-        console.log(`❌ Failed to load ${basePath}.${format}`)
-      }
-    }
-    
-    console.log(`No audio file found for ${track.title} in any supported format`)
-    return null
-  }
-
-  // Create a simple placeholder tone (much simpler than before)
-  private createPlaceholderTone(track: Track): AudioBuffer {
-    if (!this.audioContext) throw new Error('AudioContext not initialized')
-    
-    const duration = 3 // 3 seconds
-    const sampleRate = this.audioContext.sampleRate
-    const numSamples = sampleRate * duration
-    
-    const buffer = this.audioContext.createBuffer(1, numSamples, sampleRate)
-    const data = buffer.getChannelData(0)
-    
-    // Simple sine wave based on track energy
-    const frequency = 200 + (track.energy * 200) // 200-400 Hz
-    
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate
-      
-      // Simple envelope
-      let envelope = 1
-      const fadeTime = 0.1
-      if (t < fadeTime) {
-        envelope = t / fadeTime
-      } else if (t > duration - fadeTime) {
-        envelope = (duration - t) / fadeTime
-      }
-      
-      // Simple sine wave
-      data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope * 0.1
-    }
-    
-    return buffer
-  }
-
-  // Generate a silent buffer as ultimate fallback
-  private generateSilentBuffer(): AudioBuffer {
-    if (!this.audioContext) throw new Error('AudioContext not initialized')
-    
-    const duration = 1 // 1 second of silence
-    const sampleRate = this.audioContext.sampleRate
-    const numSamples = sampleRate * duration
-    
-    const buffer = this.audioContext.createBuffer(1, numSamples, sampleRate)
-    // Buffer is already filled with zeros (silence)
-    
-    return buffer
   }
 
   async playTrack(track: Track): Promise<void> {
@@ -151,22 +67,29 @@ class AudioEngine {
     }
 
     // Don't restart the same track
-    if (this.currentTrackId === track.id) {
+    if (this.currentTrackId === track.id && this.currentSource) {
+      console.log(`Already playing: ${track.title}`)
       return
     }
 
     // Load track if not already loaded
     if (!this.audioBuffers.has(track.id)) {
+      console.log(`Loading track: ${track.title}`)
       await this.loadTrack(track)
     }
 
     const audioBuffer = this.audioBuffers.get(track.id)
-    if (!audioBuffer) return
+    if (!audioBuffer) {
+      console.error(`No audio buffer found for: ${track.title}`)
+      return
+    }
+
+    console.log(`🎵 Starting playback: ${track.title} (${audioBuffer.duration}s)`)
 
     // Crossfade to new track
     await this.crossfadeToTrack(audioBuffer, track.id)
 
-    console.log(`Playing: ${track.title}`)
+    console.log(`✅ Now playing: ${track.title}`)
   }
 
   private async crossfadeToTrack(audioBuffer: AudioBuffer, trackId: string): Promise<void> {
@@ -175,115 +98,117 @@ class AudioEngine {
     const crossfadeDuration = 0.5 // 500ms crossfade
     const currentTime = this.audioContext.currentTime
 
-    // Create new source and gain for the incoming track
+    console.log(`🔄 Crossfading to track ${trackId} at time ${currentTime}`)
+
+    // Stop and clean up any existing next source (shouldn't happen, but be safe)
+    if (this.nextSource) {
+      try {
+        this.nextSource.stop()
+        this.nextSource.disconnect()
+      } catch (error) {
+        console.warn('Error stopping existing next source:', error)
+      }
+      this.nextSource = null
+      this.nextGain = null
+    }
+
+    // Create completely fresh source and gain nodes for the new track
     this.nextSource = this.audioContext.createBufferSource()
     this.nextGain = this.audioContext.createGain()
 
-    // Connect: source -> gain -> destination
+    // Configure the new source
     this.nextSource.buffer = audioBuffer
+    this.nextSource.loop = true
+    
+    // Connect: source -> gain -> destination
     this.nextSource.connect(this.nextGain)
     this.nextGain.connect(this.audioContext.destination)
 
     // Start new track at 0 volume
     this.nextGain.gain.setValueAtTime(0, currentTime)
-    this.nextSource.loop = true
-    this.nextSource.start()
+    
+    // Add error handling for the source
+    this.nextSource.onended = () => {
+      console.log(`🔚 Track ${trackId} ended unexpectedly`)
+    }
+
+    // Start the new source
+    try {
+      this.nextSource.start(0) // Start immediately
+      console.log(`▶️ Started new source for track ${trackId}`)
+    } catch (error) {
+      console.error(`Failed to start source for track ${trackId}:`, error)
+      return
+    }
 
     // Fade in new track
     this.nextGain.gain.linearRampToValueAtTime(0.7, currentTime + crossfadeDuration)
 
-    // Fade out current track if it exists
-    if (this.currentGain && this.currentSource) {
-      this.currentGain.gain.linearRampToValueAtTime(0, currentTime + crossfadeDuration)
+    // Fade out and stop current track if it exists
+    if (this.currentSource && this.currentGain) {
+      const oldSource = this.currentSource
+      const oldGain = this.currentGain
       
-      // Stop old track after fade out
+      // Fade out
+      oldGain.gain.linearRampToValueAtTime(0, currentTime + crossfadeDuration)
+      
+      // Stop and disconnect old source after fade out
       setTimeout(() => {
-        if (this.currentSource) {
-          try {
-            this.currentSource.stop()
-          } catch (error) {
-            // Source might already be stopped
-          }
+        try {
+          oldSource.stop()
+          oldSource.disconnect()
+          console.log(`🛑 Stopped and disconnected old source`)
+        } catch (error) {
+          console.warn('Error stopping old source (may already be stopped):', error)
         }
-      }, crossfadeDuration * 1000 + 100) // Add small buffer
+      }, (crossfadeDuration * 1000) + 100) // Add small buffer
     }
 
-    // Swap references
+    // Swap references - the new track becomes current
     this.currentSource = this.nextSource
     this.currentGain = this.nextGain
     this.currentTrackId = trackId
+    
+    // Clear next references
     this.nextSource = null
     this.nextGain = null
+
+    console.log(`✅ Crossfade complete for track ${trackId}`)
   }
 
   stopCurrentTrack(): void {
+    console.log('🛑 Stopping all tracks')
+    
+    // Stop and disconnect current source
     if (this.currentSource) {
       try {
         this.currentSource.stop()
+        this.currentSource.disconnect()
+        console.log('Stopped current source')
       } catch (error) {
-        // Source might already be stopped
+        console.warn('Error stopping current source:', error)
       }
       this.currentSource = null
     }
+    
+    // Stop and disconnect next source
     if (this.nextSource) {
       try {
         this.nextSource.stop()
+        this.nextSource.disconnect()
+        console.log('Stopped next source')
       } catch (error) {
-        // Source might already be stopped
+        console.warn('Error stopping next source:', error)
       }
       this.nextSource = null
     }
+    
+    // Clear gain references
     this.currentGain = null
     this.nextGain = null
     this.currentTrackId = null
-  }
-
-  // Play static/fuzz when in dead zones
-  playStatic(): void {
-    if (!this.audioContext) return
-
-    // Don't restart static if already playing
-    if (this.currentTrackId === 'static') return
-
-    this.stopCurrentTrack()
-
-    // Create filtered white noise (more pleasant than pure white noise)
-    const bufferSize = this.audioContext.sampleRate * 1 // 1 second
-    const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate)
-    const data = buffer.getChannelData(0)
-
-    // Generate filtered white noise
-    for (let i = 0; i < bufferSize; i++) {
-      const t = i / this.audioContext.sampleRate
-      
-      // Create filtered noise (less harsh than pure white noise)
-      let noise = (Math.random() * 2 - 1) * 0.08 // Lower volume
-      
-      // Apply simple low-pass filtering by averaging with previous samples
-      if (i > 0) {
-        noise = (noise + data[i - 1] * 0.3) / 1.3
-      }
-      
-      // Add some subtle modulation to make it more radio-like
-      const modulation = Math.sin(2 * Math.PI * t * 2) * 0.02
-      noise *= (1 + modulation)
-      
-      data[i] = noise
-    }
-
-    this.currentSource = this.audioContext.createBufferSource()
-    this.currentGain = this.audioContext.createGain()
-
-    this.currentSource.buffer = buffer
-    this.currentSource.connect(this.currentGain)
-    this.currentGain.connect(this.audioContext.destination)
-
-    this.currentGain.gain.setValueAtTime(0.2, this.audioContext.currentTime) // Even lower volume
-    this.currentSource.loop = true
-    this.currentSource.start()
-    this.currentTrackId = 'static'
-
-    console.log('Playing static')
+    
+    console.log('✅ All tracks stopped and cleaned up')
   }
 
   setVolume(volume: number): void {
