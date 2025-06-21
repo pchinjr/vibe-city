@@ -37,17 +37,21 @@
 ## 🛠️ Quick Setup Script
 
 ```bash
-# Download and place audio files
+# Download and place audio files (any supported format)
 cd public/audio
 
-# Option A: Use curl to download from URLs
+# The system will auto-detect these formats: .wav, .mp3, .m4a, .ogg, .flac
+# Just use the base filename:
+
+# Examples:
 curl -o electric_storm.wav "YOUR_ELECTRONIC_TRACK_URL"
-curl -o garage_anthem.wav "YOUR_ROCK_TRACK_URL"  
-curl -o midnight_drift.wav "YOUR_AMBIENT_TRACK_URL"
+curl -o garage_anthem.mp3 "YOUR_ROCK_TRACK_URL"  
+curl -o midnight_drift.m4a "YOUR_AMBIENT_TRACK_URL"
 curl -o river_folk.wav "YOUR_FOLK_TRACK_URL"
 
-# Option B: Use ffmpeg to trim longer tracks and convert to WAV
+# Or use ffmpeg to convert/trim to any format:
 ffmpeg -i long_track.mp3 -ss 00:00:30 -t 00:00:20 short_clip.wav
+ffmpeg -i long_track.wav -ss 00:00:30 -t 00:00:20 short_clip.mp3
 ```
 
 ## 🎨 Audio Characteristics by Quadrant

@@ -31,21 +31,15 @@ class AudioEngine {
     try {
       console.log(`Loading track: ${track.title}`)
       
-      // Try to load actual audio file first
-      try {
-        const response = await fetch(track.audioUrl)
-        if (response.ok) {
-          const arrayBuffer = await response.arrayBuffer()
-          const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
-          this.audioBuffers.set(track.id, audioBuffer)
-          console.log(`Loaded: ${track.title}`)
-          return
-        }
-      } catch (error) {
-        console.log(`Audio file not found for ${track.title}, generating test tone`)
+      // Try to load actual audio file - attempt multiple formats
+      const audioBuffer = await this.tryLoadAudioFile(track)
+      if (audioBuffer) {
+        this.audioBuffers.set(track.id, audioBuffer)
+        console.log(`Loaded: ${track.title}`)
+        return
       }
       
-      // Generate test tone if audio file doesn't exist
+      // Generate test tone if no audio file found
       const testBuffer = this.generateTestTone(track)
       this.audioBuffers.set(track.id, testBuffer)
       console.log(`Generated test tone for: ${track.title}`)
@@ -53,6 +47,38 @@ class AudioEngine {
     } catch (error) {
       console.error(`Failed to load track ${track.title}:`, error)
     }
+  }
+
+  // Try to load audio file in multiple formats
+  private async tryLoadAudioFile(track: Track): Promise<AudioBuffer | null> {
+    if (!this.audioContext) return null
+
+    // Extract base filename without extension
+    const basePath = track.audioUrl.replace(/\.[^/.]+$/, "")
+    
+    // Try common audio formats in order of preference
+    const formats = ['wav', 'mp3', 'm4a', 'ogg', 'flac']
+    
+    for (const format of formats) {
+      try {
+        const url = `${basePath}.${format}`
+        console.log(`Trying: ${url}`)
+        
+        const response = await fetch(url)
+        if (response.ok && response.status === 200) {
+          const arrayBuffer = await response.arrayBuffer()
+          const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
+          console.log(`✅ Found and loaded: ${url}`)
+          return audioBuffer
+        }
+      } catch (error) {
+        // Continue to next format
+        console.log(`❌ Failed to load ${basePath}.${format}`)
+      }
+    }
+    
+    console.log(`No audio file found for ${track.title} in any supported format`)
+    return null
   }
 
   // Generate a test tone based on track characteristics
