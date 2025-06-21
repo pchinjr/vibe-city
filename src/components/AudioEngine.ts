@@ -41,21 +41,58 @@ class AudioEngine {
     if (!this.audioContext || this.audioBuffers.has(track.id)) return
 
     try {
-      console.log(`Loading track: ${track.title}`)
+      console.log(`Loading track from URL: ${track.title}`)
       
-      const response = await fetch(track.audioUrl)
+      // Handle both local files and remote URLs
+      const audioUrl = track.audioUrl.startsWith('http') 
+        ? track.audioUrl 
+        : track.audioUrl // Local files stay as-is
+      
+      const response = await fetch(audioUrl, {
+        mode: 'cors', // Enable CORS for remote URLs
+        headers: {
+          'Accept': 'audio/*'
+        }
+      })
+      
       if (!response.ok) {
-        throw new Error(`Failed to fetch audio: ${response.status}`)
+        throw new Error(`Failed to fetch audio: ${response.status} - ${response.statusText}`)
       }
       
       const arrayBuffer = await response.arrayBuffer()
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer)
       
       this.audioBuffers.set(track.id, audioBuffer)
-      console.log(`✅ Loaded: ${track.title}`)
+      console.log(`✅ Loaded from URL: ${track.title} (${audioBuffer.duration}s)`)
       
     } catch (error) {
-      console.error(`Failed to load track ${track.title}:`, error)
+      console.error(`Failed to load track ${track.title} from URL:`, error)
+      
+      // Fallback: Try HTML5 Audio for streaming
+      await this.loadTrackWithHTMLAudio(track)
+    }
+  }
+
+  // Fallback method using HTML5 Audio for streaming
+  private async loadTrackWithHTMLAudio(track: Track): Promise<void> {
+    try {
+      console.log(`Trying HTML5 Audio fallback for: ${track.title}`)
+      
+      const audio = new Audio()
+      audio.crossOrigin = 'anonymous'
+      audio.src = track.audioUrl
+      
+      await new Promise((resolve, reject) => {
+        audio.addEventListener('canplaythrough', resolve)
+        audio.addEventListener('error', reject)
+        audio.load()
+      })
+      
+      // Create a simple buffer for HTML5 audio (we'll handle this differently)
+      console.log(`✅ HTML5 Audio ready: ${track.title}`)
+      
+    } catch (error) {
+      console.error(`HTML5 Audio also failed for ${track.title}:`, error)
     }
   }
 

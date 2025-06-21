@@ -1,4 +1,4 @@
-import mockTracks from '../data/mock_tracks.json'
+import EventDataService from '../services/EventDataService'
 
 export interface Track {
   id: string
@@ -11,6 +11,9 @@ export interface Track {
   show: {
     date: string
     venue: string
+    ticketUrl?: string
+    description?: string
+    price?: string
   }
 }
 
@@ -20,7 +23,21 @@ export interface VibeCoordinates {
 }
 
 class VibeEngine {
-  private tracks: Track[] = mockTracks
+  private tracks: Track[] = []
+  private isInitialized = false
+
+  // Initialize with data (will be API call in production)
+  async initialize(): Promise<void> {
+    if (this.isInitialized) return
+    
+    try {
+      this.tracks = await EventDataService.getAllTracks()
+      this.isInitialized = true
+      console.log(`🎵 Loaded ${this.tracks.length} tracks with event data`)
+    } catch (error) {
+      console.error('Failed to initialize VibeEngine:', error)
+    }
+  }
 
   // Find the closest track to given coordinates
   findNearestTrack(coordinates: VibeCoordinates): Track | null {
@@ -75,6 +92,12 @@ class VibeEngine {
   // Get track by ID
   getTrackById(id: string): Track | undefined {
     return this.tracks.find(track => track.id === id)
+  }
+
+  // Get upcoming shows
+  getUpcomingShows(): Track[] {
+    const now = new Date()
+    return this.tracks.filter(track => new Date(track.show.date) > now)
   }
 }
 

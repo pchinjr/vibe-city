@@ -243,3 +243,43 @@
     padding: 2px 8px;
   }
 }
+.show-price {
+  color: #4ade80;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.25rem 0;
+}
+
+.show-description {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  margin: 0.5rem 0;
+  font-style: italic;
+  max-width: 250px;
+}
+.expand-hint {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.now-playing.hovering .expand-hint {
+  color: #ff6b6b;
+  transform: scale(1.1);
+}
+
+.now-playing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.now-playing-indicator:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}

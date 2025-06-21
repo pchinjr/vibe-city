@@ -1,54 +1,82 @@
 [
   {
     "id": "1",
-    "title": "Electric Storm",
-    "artist": "Neon Pulse",
+    "title": "Wednesday Jazz",
+    "artist": "Dexter Bell & Friends",
     "audioUrl": "/audio/electric_storm.wav",
-    "energy": 0.8,
-    "texture": 0.8,
-    "tags": ["electronic", "energetic", "synthetic"],
+    "energy": 0.3,
+    "texture": 0.4,
+    "tags": ["jazz", "smooth", "live"],
     "show": {
-      "date": "2025-01-15T21:00:00",
-      "venue": "The Signal"
+      "date": "2025-06-18T20:00:00",
+      "venue": "Barking Legs",
+      "ticketUrl": "https://www.barkinglegs.org/ourevents/wednesday-jazz-dexter-bell",
+      "description": "Join us for an intimate evening of jazz with Dexter Bell & Friends",
+      "price": "$15-25"
     }
   },
   {
     "id": "2",
-    "title": "Garage Anthem",
-    "artist": "Rust & Thunder",
+    "title": "Rock Anthem",
+    "artist": "Cowboy Mouth",
     "audioUrl": "/audio/garage_anthem.mp3",
-    "energy": 0.8,
-    "texture": 0.2,
-    "tags": ["rock", "punk", "raw"],
+    "energy": 0.9,
+    "texture": 0.3,
+    "tags": ["rock", "energetic", "live"],
     "show": {
-      "date": "2025-01-20T20:30:00",
-      "venue": "Barking Legs Theater"
+      "date": "2025-07-11T21:00:00",
+      "venue": "Barrelhouse Ballroom",
+      "ticketUrl": "https://app.promotix.com/events/details/Cowboy-Mouth-tickets",
+      "description": "High-energy rock show with New Orleans legends Cowboy Mouth",
+      "price": "$25-45"
     }
   },
   {
     "id": "3",
-    "title": "Midnight Drift",
-    "artist": "Velvet Shadows",
+    "title": "Valley Dreams",
+    "artist": "Heavy Valley",
     "audioUrl": "/audio/midnight_drift.wav",
-    "energy": 0.2,
-    "texture": 0.8,
-    "tags": ["ambient", "dreamy", "synthetic"],
+    "energy": 0.7,
+    "texture": 0.6,
+    "tags": ["indie", "atmospheric", "dreamy"],
     "show": {
-      "date": "2025-02-05T19:00:00",
-      "venue": "Songbirds"
+      "date": "2025-07-27T20:30:00",
+      "venue": "Cherry St. Tavern",
+      "ticketUrl": "https://www.eventbrite.com/e/heavy-valley-chattanooga-2025-tickets-1312867103849",
+      "description": "Atmospheric indie rock from Heavy Valley",
+      "price": "$20-30"
     }
   },
   {
     "id": "4",
-    "title": "River Folk",
-    "artist": "Mountain Hollow",
+    "title": "String Arrangements",
+    "artist": "Vitamin String Quartet",
     "audioUrl": "/audio/river_folk.wav",
-    "energy": 0.2,
-    "texture": 0.2,
-    "tags": ["folk", "acoustic", "organic"],
+    "energy": 0.4,
+    "texture": 0.8,
+    "tags": ["classical", "orchestral", "covers"],
     "show": {
-      "date": "2025-01-28T20:00:00",
-      "venue": "JJ's Bohemia"
+      "date": "2025-11-02T19:30:00",
+      "venue": "Memorial & Walker Theatre",
+      "ticketUrl": "https://www.ticketmaster.com/event/1B006265B4FEA65F",
+      "description": "String quartet arrangements of popular songs",
+      "price": "$35-75"
+    }
+  },
+  {
+    "id": "5",
+    "title": "Potholes",
+    "artist": "Call Me Spinster",
+    "audioUrl": "/audio/potholes_preview.wav",
+    "energy": 0.6,
+    "texture": 0.4,
+    "tags": ["indie", "alternative", "local", "bandcamp"],
+    "show": {
+      "date": "2025-08-15T21:00:00",
+      "venue": "The Honest Pint",
+      "ticketUrl": "https://callmespinster.bandcamp.com/album/potholes",
+      "description": "Local indie alternative from Call Me Spinster - Full album on Bandcamp",
+      "price": "$10-15"
     }
   }
 ]

@@ -10,38 +10,12 @@ interface Props {
 
 const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }) => {
   const [showDetails, setShowDetails] = useState(false)
-  const [autoShowTimer, setAutoShowTimer] = useState<NodeJS.Timeout | null>(null)
+  const [isHovering, setIsHovering] = useState(false)
 
-  // Auto-show details after 3 seconds of listening to the same track
+  // Reset details when track changes
   useEffect(() => {
-    if (track && isVisible) {
-      // Clear existing timer
-      if (autoShowTimer) {
-        clearTimeout(autoShowTimer)
-      }
-      
-      // Set new timer
-      const timer = setTimeout(() => {
-        setShowDetails(true)
-      }, 3000)
-      
-      setAutoShowTimer(timer)
-    } else {
-      // Clear timer if no track or not visible
-      if (autoShowTimer) {
-        clearTimeout(autoShowTimer)
-        setAutoShowTimer(null)
-      }
-      setShowDetails(false)
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (autoShowTimer) {
-        clearTimeout(autoShowTimer)
-      }
-    }
-  }, [track?.id, isVisible])
+    setShowDetails(false)
+  }, [track?.id])
 
   if (!track || !isVisible) {
     return null
@@ -62,11 +36,29 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }
 
   const dateInfo = formatDate(track.show.date)
 
+  const handleClick = () => {
+    setShowDetails(!showDetails)
+  }
+
+  const handleMouseEnter = () => {
+    setIsHovering(true)
+    setShowDetails(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovering(false)
+    // Only hide if not manually clicked
+    if (!showDetails) {
+      setShowDetails(false)
+    }
+  }
+
   return (
     <div 
-      className={`now-playing ${showDetails ? 'expanded' : ''}`}
-      onMouseEnter={() => setShowDetails(true)}
-      onMouseLeave={() => setShowDetails(false)}
+      className={`now-playing ${showDetails ? 'expanded' : ''} ${isHovering ? 'hovering' : ''}`}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Always visible: Now playing indicator */}
       <div className="now-playing-indicator">
@@ -74,6 +66,9 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }
         <div className="track-info">
           <div className="track-title">{track.title}</div>
           <div className="artist-name-small">{track.artist}</div>
+        </div>
+        <div className="expand-hint">
+          {showDetails ? '▼' : '▶'}
         </div>
       </div>
 
@@ -97,6 +92,16 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }
             <div className="show-venue">
               📍 {track.show.venue}
             </div>
+            {track.show.price && (
+              <div className="show-price">
+                💰 {track.show.price}
+              </div>
+            )}
+            {track.show.description && (
+              <div className="show-description">
+                {track.show.description}
+              </div>
+            )}
             {dateInfo.isUpcoming && (
               <div className="upcoming-indicator">🔥 Upcoming Show!</div>
             )}
@@ -105,7 +110,10 @@ const NowPlaying: React.FC<Props> = ({ track, isVisible = false, onShowDetails }
           {/* Call to Action */}
           <button 
             className="get-tickets-cta"
-            onClick={() => onShowDetails?.(track)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onShowDetails?.(track)
+            }}
           >
             {dateInfo.isUpcoming ? '🎫 Get Tickets' : '🎵 More Info'}
           </button>

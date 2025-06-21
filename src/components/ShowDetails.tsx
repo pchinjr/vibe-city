@@ -38,13 +38,17 @@ const ShowDetails: React.FC<Props> = ({ track, isVisible, onClose }) => {
   const handleGetTickets = async () => {
     setIsTicketLoading(true)
     
-    // Simulate ticket lookup/redirect
+    // Use the real ticket URL from the event data
     setTimeout(() => {
-      // In a real app, this would redirect to ticketing platform
-      const ticketUrl = `https://www.eventbrite.com/e/search?q=${encodeURIComponent(track.artist + ' ' + track.show.venue)}`
-      window.open(ticketUrl, '_blank')
+      if (track.show.ticketUrl) {
+        window.open(track.show.ticketUrl, '_blank')
+      } else {
+        // Fallback to search if no direct URL
+        const ticketUrl = `https://www.eventbrite.com/e/search?q=${encodeURIComponent(track.artist + ' ' + track.show.venue)}`
+        window.open(ticketUrl, '_blank')
+      }
       setIsTicketLoading(false)
-    }, 1000)
+    }, 800)
   }
 
   const handleGetDirections = () => {
@@ -81,7 +85,10 @@ const ShowDetails: React.FC<Props> = ({ track, isVisible, onClose }) => {
         <div className="show-info-section">
           <div className="show-date">
             <div className="date-main">{dateInfo.formatted}</div>
-            <div className="date-time">Doors at 8:00 PM • Show at 9:00 PM</div>
+            <div className="date-time">{dateInfo.time}</div>
+            {track.show.price && (
+              <div className="ticket-price">💰 {track.show.price}</div>
+            )}
             {!dateInfo.isUpcoming && (
               <div className="date-past">This show has already happened</div>
             )}
@@ -90,6 +97,9 @@ const ShowDetails: React.FC<Props> = ({ track, isVisible, onClose }) => {
           <div className="venue-info">
             <div className="venue-name">📍 {track.show.venue}</div>
             <div className="venue-address">Chattanooga, TN</div>
+            {track.show.description && (
+              <div className="show-description">{track.show.description}</div>
+            )}
           </div>
         </div>
 

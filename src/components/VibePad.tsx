@@ -17,17 +17,22 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
   const [needsUserInteraction, setNeedsUserInteraction] = useState(true)
   const padRef = useRef<HTMLDivElement>(null)
 
-  // Initialize tracks list (but not audio context)
+  // Initialize tracks list and VibeEngine
   useEffect(() => {
-    const tracks = VibeEngine.getAllTracks()
-    AudioEngine.preloadAllTracks(tracks)
-    
-    // Set initial track for display
-    const initialTrack = VibeEngine.findNearestTrack(coordinates)
-    if (initialTrack) {
-      setCurrentTrack(initialTrack)
-      onTrackChange?.(initialTrack)
+    const initializeData = async () => {
+      await VibeEngine.initialize()
+      const tracks = VibeEngine.getAllTracks()
+      AudioEngine.preloadAllTracks(tracks)
+      
+      // Set initial track for display
+      const initialTrack = VibeEngine.findNearestTrack(coordinates)
+      if (initialTrack) {
+        setCurrentTrack(initialTrack)
+        onTrackChange?.(initialTrack)
+      }
     }
+    
+    initializeData()
   }, [])
 
   // Handle coordinate changes and find nearest track
