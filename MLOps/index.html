@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vibe Analyzer</title>
+</head>
+<body>
+  <h2>Analyzing local audio file: <code>audio/electric_storm.wav</code></h2>
+  <p>Check the console for the energy and texture values.</p>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      const audioUrl = 'audio/electric_storm.wav';
+      const { energy, texture } = await analyzeVibe(audioUrl);
+      console.log(`Energy: ${energy.toFixed(3)}, Texture: ${texture.toFixed(3)}`);
+    });
+
+    async function analyzeVibe(audioUrl) {
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const response = await fetch(audioUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await context.decodeAudioData(arrayBuffer);
+
+      const channelData = audioBuffer.getChannelData(0);
+
+      const rms = Math.sqrt(
+        channelData.reduce((sum, x) => sum + x * x, 0) / channelData.length
+      );
+      const energy = clamp(map(rms, 0.01, 0.2, 0, 1));
+
+      const offlineContext = new OfflineAudioContext(1, audioBuffer.length, audioBuffer.sampleRate);
+      const source = offlineContext.createBufferSource();
+      source.buffer = audioBuffer;
+
+      const analyser = offlineContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyser.connect(offlineContext.destination);
+      source.start();
+
+      const freqData = new Float32Array(analyser.frequencyBinCount);
+      await offlineContext.startRendering();
+      analyser.getFloatFrequencyData(freqData);
+
+      let weightedSum = 0;
+      let total = 0;
+      for (let i = 0; i < freqData.length; i++) {
+        const amplitude = Math.pow(10, freqData[i] / 10);
+        weightedSum += i * amplitude;
+        total += amplitude;
+      }
+
+      const centroid = weightedSum / total;
+      const texture = clamp(map(centroid, 5, 500, 0, 1));
+
+      return { energy, texture };
+    }
+
+    function clamp(val, min = 0, max = 1) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function map(val, inMin, inMax, outMin, outMax) {
+      return ((val - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin;
+    }
+  </script>
+</body>
+</html>
