@@ -2,12 +2,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .vibe-pad {
-  width: 400px;
-  height: 400px;
+  width: min(400px, 90vw);
+  height: min(400px, 90vw);
+  aspect-ratio: 1;
   background: 
     radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
     linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
@@ -24,9 +28,10 @@
     inset 0 0 20px rgba(0, 0, 0, 0.5),
     0 0 30px rgba(255, 255, 255, 0.1);
   transition: box-shadow 0.2s ease;
+  touch-action: none; /* Prevent scrolling on touch */
 }
 
-.vibe-pad:hover {
+.vibe-pad:hover, .vibe-pad.hovering {
   box-shadow: 
     inset 0 0 20px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(255, 255, 255, 0.2);
@@ -49,15 +54,23 @@
   box-shadow: 
     0 0 15px rgba(255, 107, 107, 0.8),
     inset 0 0 5px rgba(255, 255, 255, 0.3);
-  transition: all 0.1s ease;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
+  pointer-events: none;
 }
 
 .vibe-pad.dragging .vibe-cursor {
-  transform: translate(-50%, -50%) scale(1.2);
+  transform: translate(-50%, -50%) scale(1.3);
   box-shadow: 
     0 0 25px rgba(255, 107, 107, 1),
     inset 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.vibe-pad.hovering .vibe-cursor {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 
+    0 0 20px rgba(255, 107, 107, 0.9),
+    inset 0 0 6px rgba(255, 255, 255, 0.4);
 }
 
 .grid-lines {
@@ -85,18 +98,20 @@
 }
 
 .coordinates-debug {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 12px 16px;
   border-radius: 8px;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   border: 1px solid #444;
   text-align: center;
-  min-width: 250px;
+  width: 100%;
+  max-width: 300px;
+  backdrop-filter: blur(5px);
 }
 
 .coordinates-debug div {
-  margin: 2px 0;
+  margin: 3px 0;
   opacity: 0.9;
 }
 
@@ -145,4 +160,29 @@
   border-top: 1px solid #555;
   color: #ff6b6b !important;
   font-weight: bold;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .vibe-pad-container {
+    gap: 12px;
+  }
+  
+  .coordinates-debug {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vibe-pad {
+    width: min(300px, 85vw);
+    height: min(300px, 85vw);
+  }
+  
+  .coordinates-debug {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+  }
 }

@@ -22,16 +22,17 @@
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   border: 2px solid #ff6b6b;
   border-radius: 20px;
-  padding: 30px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
+  padding: 25px;
+  max-width: min(500px, 90vw);
+  width: 100%;
+  max-height: min(90vh, 800px);
   overflow-y: auto;
   position: relative;
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(255, 107, 107, 0.2);
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 20px;
 }
 
 @keyframes slideUp {
@@ -69,16 +70,22 @@
 }
 
 .artist-name {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: bold;
   color: #ff6b6b;
   margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .track-title {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   color: #ccc;
   font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .show-info-section {
@@ -260,20 +267,54 @@
 /* Mobile responsive */
 @media (max-width: 768px) {
   .show-details-modal {
-    margin: 10px;
+    margin: 15px;
     padding: 20px;
     max-height: 95vh;
+    border-radius: 15px;
   }
   
-  .artist-name {
-    font-size: 1.5rem;
+  .close-button {
+    top: 10px;
+    right: 15px;
+    font-size: 1.8rem;
+  }
+  
+  .show-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
   }
   
   .secondary-actions {
     flex-direction: column;
+    gap: 8px;
   }
   
   .secondary-button {
-    margin-bottom: 8px;
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .show-details-modal {
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+  }
+  
+  .show-header {
+    margin-bottom: 15px;
+  }
+  
+  .show-info-section {
+    margin-bottom: 20px;
+  }
+  
+  .vibe-preview {
+    margin-bottom: 20px;
+  }
+  
+  .primary-button {
+    padding: 12px 16px;
+    font-size: 1rem;
   }
 }

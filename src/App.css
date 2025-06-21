@@ -1,22 +1,24 @@
 .app {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #2c1810, #1a1a1a);
   color: #fff;
   font-family: 'Courier New', monospace;
+  overflow-x: hidden;
 }
 
 .app-header {
   text-align: center;
-  padding: 20px;
+  padding: 15px 20px;
   background: rgba(0, 0, 0, 0.3);
   border-bottom: 2px solid #444;
+  flex-shrink: 0;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
@@ -24,6 +26,7 @@
   margin: 5px 0 0 0;
   opacity: 0.8;
   font-style: italic;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .vibe-container {
@@ -32,18 +35,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 20px;
+  min-height: 0; /* Allow flex shrinking */
 }
 
+/* Remove old footer styles since we're using floating components now */
 .now-playing {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 30px;
-  background: rgba(0, 0, 0, 0.5);
-  border-top: 2px solid #444;
-  font-size: 0.9rem;
+  display: none; /* This is now handled by the NowPlaying component */
 }
 
-.now-playing span {
-  opacity: 0.9;
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 10px 15px;
+  }
+  
+  .vibe-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .vibe-container {
+    padding: 10px;
+  }
 }

@@ -11,6 +11,7 @@ interface Props {
 const VibePad: React.FC<Props> = ({ onTrackChange }) => {
   const [coordinates, setCoordinates] = useState<VibeCoordinates>({ x: 0.5, y: 0.5 })
   const [isDragging, setIsDragging] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
   const [isAudioReady, setIsAudioReady] = useState(false)
   const [needsUserInteraction, setNeedsUserInteraction] = useState(true)
@@ -121,11 +122,15 @@ const VibePad: React.FC<Props> = ({ onTrackChange }) => {
     <div className="vibe-pad-container">
       <div 
         ref={padRef}
-        className={`vibe-pad ${isDragging ? 'dragging' : ''} ${needsUserInteraction ? 'needs-interaction' : ''}`}
+        className={`vibe-pad ${isDragging ? 'dragging' : ''} ${isHovering ? 'hovering' : ''} ${needsUserInteraction ? 'needs-interaction' : ''}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={() => {
+          handleMouseUp()
+          setIsHovering(false)
+        }}
+        onMouseEnter={() => setIsHovering(true)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
